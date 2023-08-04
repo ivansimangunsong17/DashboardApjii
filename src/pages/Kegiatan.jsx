@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsTrash, BsPlusSquare } from 'react-icons/bs';
 import { AiTwotoneEdit } from 'react-icons/ai';
 import { FaFileDownload } from 'react-icons/fa';
 import Modal from '../components/Modal';
+import { getCategories, addArticle } from '../services/API';
 
 const Kegiatan = () => {
     const [showModal, setShowModal] = useState(false);
@@ -12,27 +13,55 @@ const Kegiatan = () => {
     const [tanggal, setTanggal] = useState("");
     const [file, setFile] = useState(null);
     const [modalDelete, setModalDelete] = useState(false);
+    const [format, setFormat] = useState('Dokumen');
+    const [listKategori, setListKategori] = useState([]);
+
+    useEffect(() => {
+        getCategories()
+            .then((res) => {
+                const listDataKategori = res.data.results;
+                setListKategori(listDataKategori);
+            })
+            .catch((err) => console.err("error", err))
+    }, []);
+
+    const [createArtikel, setCreateArtikel] = useState({
+        kategori: "",
+        judul: "",
+        deskripsi: "",
+    });
+
 
     const handleSubmit = (e) => {
+        // e.preventDefault();
+
+        // const newEntry = {
+        //     judul: judul,
+        //     deskripsi: deskripsi,
+        //     tanggal: tanggal,
+        //     file: file,
+        // };
+
+
+        // setFormData([...formData, newEntry]);
+
+        // setJudul("");
+        // setDeskripsi("");
+        // setTanggal("");
+        // setFile(null);
+
+        // setShowModal(false);
+
+
         e.preventDefault();
+        addArticle(createArtikel)
+            .then((res) => {
+                const listArtikel = res.data.results;
+                setCreateArtikel(listArtikel);
+            })
 
-        const newEntry = {
-            judul: judul,
-            deskripsi: deskripsi,
-            tanggal: tanggal,
-            file: file,
-        };
+            .catch((err) => console.error("error", err));
 
-
-        setFormData([...formData, newEntry]);
-
-        setJudul("");
-        setDeskripsi("");
-        setTanggal("");
-        setFile(null);
-
-
-        setShowModal(false);
     };
 
     const handleDeleteEntry = (index) => {
@@ -63,7 +92,7 @@ const Kegiatan = () => {
                                 <th className='w-1/6 border border-black px-2 py-2'>Judul</th>
                                 <th className='w-2/6 border border-black px-2 py-2'>Deskripsi</th>
                                 <th className='w-1/6 border border-black px-2 py-2 text-center'>Tipe</th>
-                                <th className='w-1/6 border border-black px-2 py-2 text-center'>Format</th>
+                                <th className='w-1/6 border border-black px-2 py-2 text-center'>Kategori</th>
                                 <th className='w-1/6 border border-black px-2 py-2'>Aksi</th>
                             </tr>
                         </thead>
@@ -77,10 +106,10 @@ const Kegiatan = () => {
                             ) : (
                                 formData.map((entry, index) => (
                                     <tr key={index} className='border border-x-black'>
-                                        <td className='w-1/6 border border-black px-2 py-2 text-center'>{entry.tanggal}</td>
+                                        {/* <td className='w-1/6 border border-black px-2 py-2 text-center'>{entry.tanggal}</td> */}
                                         <td className='w-1/6 border border-black px-2 py-2'>{entry.judul}</td>
                                         <td className='w-2/6 border border-black px-2 py-2 text-justify'>{entry.deskripsi}</td>
-                                        <td className='w-1/6 border border-black px-2 py-2 text-center'>{entry.tipe || 'PDF'}</td>
+                                        <td className='w-1/6 border border-black px-2 py-2 text-center'>{entry.tipe || 'Dokument'}</td>
                                         <td className='w-1/6 border border-black px-2 py-2 text-center'>{entry.format || 'Dokumen'}</td>
                                         <td className='w-1/6 border border-black px-2 py-2'>
                                             <div className='flex justify-center items-center gap-2'>
@@ -109,7 +138,28 @@ const Kegiatan = () => {
 
                 <div>
                     <Modal showModal={showModal}>
-                        <form onSubmit={handleSubmit} className='w-[400px]'>
+                        <form onSubmit={handleSubmit} className='w-[480px]'>
+                            <div className="mb-4">
+                                <label htmlFor="fileFormat" className="block text-gray-700 font-bold mb-2">
+                                    Pilih Kategori:
+                                </label>
+                                <select
+                                    id="fileFormat"
+                                    value={createArtikel.nama}
+                                    onChange={(e) => setCreateArtikel({ ...createArtikel, kategori: e.target.value })}
+
+                                    className="border border-gray-400 rounded-md py-2 pl-3 pr-8 w-full"
+                                    required
+                                >
+                                    {listKategori.map((kategori) => (
+                                        <option key={kategori.id} value={createArtikel.nama}>{kategori.nama}</option>
+                                    ))}
+
+                                    {/* <option value="Dokumen">ISP</option>
+                                    <option value="PDF">Internet</option> */}
+
+                                </select>
+                            </div>
 
                             <div className='mb-4'>
                                 <label htmlFor="documentType" className="block text-gray-700 font-bold mb-2">
@@ -118,11 +168,12 @@ const Kegiatan = () => {
                                 <input
                                     type="text"
                                     id="documentType"
-                                    value={judul}
-                                    onChange={(e) => setJudul(e.target.value)}
+                                    value={createArtikel.judul}
+                                    onChange={(e) => setCreateArtikel({ ...createArtikel, judul: e.target.value })}
                                     className="border border-gray-400 px-3 py-2 w-full"
                                     required
                                 />
+
                             </div>
 
                             <div className="mb-4">
@@ -131,14 +182,14 @@ const Kegiatan = () => {
                                 </label>
                                 <textarea
                                     id="description"
-                                    value={deskripsi}
-                                    onChange={(e) => setDeskripsi(e.target.value)}
+                                    value={createArtikel.deskripsi}
+                                    onChange={(e) => setCreateArtikel({ ...createArtikel, deskripsi: e.target.value })}
                                     className="border border-gray-400  px-3 py-2 w-full"
                                     required
                                 />
                             </div>
 
-                            <div className="mb-4">
+                            {/* <div className="mb-4">
                                 <label htmlFor="date" className="block text-gray-700 font-bold mb-2">
                                     Date:
                                 </label>
@@ -150,7 +201,7 @@ const Kegiatan = () => {
                                     className="border border-gray-400 px-3 py-2 w-full"
                                     required
                                 />
-                            </div>
+                            </div> */}
 
                             <div className="mb-4 ">
                                 <label htmlFor="file" className="block text-gray-700 font-bold mb-2">
@@ -160,11 +211,13 @@ const Kegiatan = () => {
                                     type="file"
                                     id="file"
                                     accept=".pdf"
-                                    onChange={(e) => setFile(e.target.files[0])}
+                                    value={createArtikel.file}
+                                    onChange={(e) => setCreateArtikel({ ...createArtikel, file: e.target.value })}
                                     className="border border-gray-400 rounded-md py-2 ps-[30px] w-full"
                                     required
                                 />
                             </div>
+
 
                             <div className='flex justify-end gap-3'>
                                 <div>
