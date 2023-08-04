@@ -3,7 +3,7 @@ import Globe from '../assets/img/globe.png';
 import Waves from '../assets/img/wave.svg'
 import React from 'react';
 
-const Hero = () => {
+const Dashboard = () => {
     return (<div className='w-full min-h-screen bg-gradient-to-b from-[#215385] to-[#000] relative '>
         <div className='text-white w-fit  mt-44 ms-10 absolute z-50'>
             <h1 className='font-bold text-6xl'>Hello Admin</h1>
@@ -17,4 +17,4 @@ const Hero = () => {
     </div>);
 }
 
-export default Hero;
+export default Dashboard;

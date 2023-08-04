@@ -1,18 +1,23 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
 import './App.css'
-import Dashboard from './components/dashboard'
-import Hero from './components/hero'
+import Layout from './layout/Layout'
+import Dashboard from './pages/Dashboard'
+import Kegiatan from './pages/Kegiatan'
+import PagesNotFound from './pages/PagesNotFound'
 
 function App() {
   return (
     <Router>
-      <div>
-        <Routes>
-          <Route path='/' element={<Dashboard />} />
-          <Route path='/*' element={<Hero />} />
-        </Routes>
-      </div>
+      <Routes>
+        {/* <Route path='/' element={<Home />} /> */}
+
+        <Route element={<Layout />}>
+          <Route path='dashboard' element={<Dashboard />} />
+          <Route path='kegiatan' element={<Kegiatan />} />
+        </Route>
+        <Route path='*' element={<PagesNotFound />} />
+      </Routes>
     </Router>
   )
 }

@@ -1,34 +1,20 @@
 import React, { useState } from 'react';
-import { HiMenu } from 'react-icons/hi';
 import { BiSolidDashboard } from 'react-icons/bi';
-import { CgProfile } from 'react-icons/cg';
 import { BsFileEarmarkCheckFill } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
+import { CgProfile } from 'react-icons/cg';
+import { HiMenu } from 'react-icons/hi';
+import { NavLink, Outlet } from 'react-router-dom';
 import LogoApjii from '../assets/img/logo.png';
-import Table from './table';
-import Hero from './hero';
 
-
-
-const Dashboard = () => {
+const Layout = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [open, setOpen] = useState(true);
-    const [showTable, setShowTable] = useState(false);
-    const [activeMenu, setActiveMenu] = useState('Dashboard');
+
 
     const menus = [
-        { name: 'Dashboard', icon: BiSolidDashboard },
-        { name: 'Kegiatan', icon: BsFileEarmarkCheckFill },
+        { name: 'Dashboard', icon: BiSolidDashboard, link: '/dashboard' },
+        { name: 'Kegiatan', icon: BsFileEarmarkCheckFill, link: '/kegiatan' },
     ];
-
-    const handleMenuClick = (menuName) => {
-        setActiveMenu(menuName);
-        if (menuName === 'Dashboard') {
-            setShowTable(false);
-        } else if (menuName === 'Kegiatan') {
-            setShowTable(true);
-        }
-    };
 
     return (
         <section className='flex flex-row min-h-screen drop-shadow-md'>
@@ -41,19 +27,22 @@ const Dashboard = () => {
                         </>
                     ) : null}
                     {menus?.map((menu, i) => (
-                        <Link
+                        <NavLink
                             to={menu.link} // Use the link property to set the URL
                             key={i}
-                            className={`flex justify-start text-sm font-bold p-2 gap-4 ms-5 ${activeMenu === menu.name ? 'text-blue-500' : ''}`}
-                            onClick={() => handleMenuClick(menu.name)}
                         >
-                            <div className=''>{React.createElement(menu.icon, { size: 30 })}</div>
-                            <h2
-                                className={`whitespace-pre ${!open ? 'opacity-0 translate-x-0 overflow-hidden' : ''}`}
-                            >
-                                {menu.name}
-                            </h2>
-                        </Link>
+                            {({ isActive, isPending }) => (
+                                <div className={`flex justify-start text-sm font-bold p-2 gap-4 ms-5 ${isActive ? "text-blue-500" : ""} `}>
+                                    <div className=''>{React.createElement(menu.icon, { size: 30 })}</div>
+                                    <h2
+                                        className={`whitespace-pre ${!open ? 'opacity-0 translate-x-0 overflow-hidden' : ''}`}
+                                    >
+                                        {menu.name}
+                                    </h2>
+
+                                </div>
+                            )}
+                        </NavLink>
                     ))}
                 </div>
             </div>
@@ -83,12 +72,12 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div className='MainKonten flex justify-center'>
-                    {showTable ? <Table /> : <Hero />}
+                <div className='MainKonten '>
+                    <Outlet />
                 </div>
             </div>
         </section>
-    );
-};
+    )
+}
 
-export default Dashboard;
+export default Layout
